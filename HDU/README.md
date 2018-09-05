@@ -123,3 +123,172 @@ int main() {
   return 0;
 }
 ```
+
+### 2099 整除的尾数 - HDOJ -u
+
+#### Problem Description
+一个整数，只知道前几位，不知道末二位，被另一个整数除尽了，那么该数的末二位该是什么呢？
+ 
+
+#### Input
+输入数据有若干组，每组数据包含二个整数a，b（0<a<10000, 10<b<100），若遇到0 0则处理结束。
+ 
+
+#### Output
+对应每组数据，将满足条件的所有尾数在一行内输出，格式见样本输出。同组数据的输出，其每个尾数之间空一格，行末没有空格。
+ 
+
+#### Sample Input
+200 40
+1992 95
+0 0
+ 
+
+#### Sample Output
+00 40 80
+15
+ 
+
+#### Source
+2007省赛集训队练习赛（2）
+ 
+
+#### Recommend
+lcy   |   We have carefully selected several similar problems for you:  2098 2096 2091 2081 2017 
+
+#### Solution:
+
+找到0~99之间的第一个满足的条件的末尾两个数, 然后用一个等差数列寻找其他符合条件的值, 不完全遍历100个数.
+
+坑点:
+> * debug01把区间扩大成了[0, 100], 这样子的话, 造成100成为尾数, 不可能的。
+
+代码:
+```cpp
+#include <cstdio>
+
+int main() {
+  int a, b, cnt = 0;
+  while (scanf("%d %d", &a, &b) != EOF && a && b) {
+    int sum = a * 100;
+    int i = 0, find = 0;
+    for ( ; i < 100; i++) {
+      if ((sum + i) % b == 0) {
+        find = 1;
+        break;
+      }
+    }
+    if (!find) {
+      printf("\n");
+    } else {   // find
+      int start = i, k = (99-start) / b;   // debug01:
+      printf("%02d", start);
+      for (int i  = 0; i < k; i++) {
+        printf(" %02d", start + (i+1) * b);
+      }
+      printf("\n");
+    }
+  }
+  return 0;
+}
+```
+
+
+### 2096 小明A+B -uw
+
+#### Problem Description
+小明今年3岁了, 现在他已经能够认识100以内的非负整数, 并且能够进行100以内的非负整数的加法计算.
+对于大于等于100的整数, 小明仅保留该数的最后两位进行计算, 如果计算结果大于等于100, 那么小明也仅保留计算结果的最后两位.
+
+例如, 对于小明来说:
+1) 1234和34是相等的
+2) 35+80=15
+
+给定非负整数A和B, 你的任务是代表小明计算出A+B的值.
+ 
+
+#### Input
+输入数据的第一行为一个正整数T, 表示测试数据的组数. 然后是T组测试数据. 每组测试数据包含两个非负整数A和B(A和B均在int型可表示的范围内).
+ 
+
+#### Output
+对于每组测试数据, 输出小明A+B的结果.
+ 
+
+#### Sample Input
+2
+35 80
+15 1152
+ 
+
+#### Sample Output
+15
+67
+
+
+#### Solution:
+
+```cpp
+/*
+#include <cstdio>
+
+int main() {
+  int T; scanf("%d", &T);
+  while (T--) {
+    int a, b; scanf("%d %d", &a, &b);
+    int sum, ans = 0;
+    sum = a + b;
+    if (sum >= 100) {
+      ans += sum % 10;
+      ans += (sum/10%10) * 10;
+    } else {
+      ans = sum;
+    }
+    printf("%02d\n", ans);   // 改了也没ac
+  }
+  return 0;
+}
+
+// WA
+*/
+
+// 推测溢出, 只加后两位
+#include <cstdio>
+#include <cstring>
+// #include <cmath>
+
+int arr_a[1005], arr_b[1005], len_a, len_b;
+
+int K = 2;
+
+int main() {
+  int T; scanf("%d", &T);
+  while (T--) {
+    int a, b; scanf("%d %d", &a, &b);
+    memset(arr_a, 0, sizeof(arr_a));
+    memset(arr_b, 0, sizeof(arr_b));
+    len_a = 0, len_b = 0;
+
+    while (a && len_a < K) {
+      arr_a[len_a++] = a % 10;
+      a /= 10;
+    }
+
+    while (b && len_b < K) {
+      arr_b[len_b++] = b % 10;
+      b /= 10;
+    }
+
+    int ans = 0, carry = 0, temp = 0, s = 1;
+    for (int i = 0; i < K; i++) {
+      temp = arr_a[i] + arr_b[i] + carry;
+      ans += (temp % 10) * s;
+      s *= 10;
+      carry = temp/10;
+    }
+    printf("%d\n", ans);
+  }
+
+  return 0;
+}
+```
